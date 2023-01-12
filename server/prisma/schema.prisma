@@ -10,14 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Products {
+model Product {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   price     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String   @db.ObjectId
 }
 
 model User {
@@ -27,5 +25,4 @@ model User {
   password  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  products  Products[]
 }
