@@ -23,9 +23,7 @@ export class ProductController {
 
   @Get('get/:id')
   async getProductById(@Param('id') productId: string) {
-    const getProductById = await this.productService.getProductUserById(
-      productId,
-    );
+    const getProductById = await this.productService.getProductById(productId);
 
     if (!getProductById) {
       return new NotFoundException(`userId ${productId} not found product`);
@@ -34,7 +32,7 @@ export class ProductController {
   }
 
   @Post('add')
-  createBookmark(@Body() dto: CreateProductDto) {
+  createProduct(@Body() dto: CreateProductDto) {
     return this.productService.createProduct(dto);
   }
 

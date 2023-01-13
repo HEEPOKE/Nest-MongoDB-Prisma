@@ -18,7 +18,7 @@ export class ProductService {
     return data;
   }
 
-  async getProductUserById(productId: string) {
+  async getProductById(productId: string) {
     const product = await this.prisma.product.findFirst({
       where: {
         id: productId,

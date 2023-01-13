@@ -1,26 +1,106 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto, UpdateUserDto } from './dto/';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private prisma: PrismaService) {}
+
+  async findAll() {
+    const user = await this.prisma.user.findMany();
+
+    const data = {
+      message: 'success',
+      status: 'success',
+      data: user,
+    };
+
+    return data;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async getUserById(userId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    const data = {
+      message: 'success',
+      status: 'success',
+      data: user,
+    };
+
+    return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async createUser(createUserDto: CreateUserDto) {
+    const user = await this.prisma.user.create({
+      data: {
+        ...createUserDto,
+      },
+    });
+
+    const data = {
+      message: 'success',
+      status: 'success',
+      data: user,
+    };
+
+    return data;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updateUser(userId: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || user.id !== userId) {
+      throw new ForbiddenException('Access to resources denied');
+    } else {
+      const dto = await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          ...updateUserDto,
+        },
+      });
+
+      const data = {
+        message: 'success',
+        status: 'success',
+        data: dto,
+      };
+
+      return data;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async deleteUserById(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || user.id !== userId) {
+      throw new ForbiddenException('Access to resources denied');
+    } else {
+      await this.prisma.user.delete({
+        where: {
+          id: userId,
+        },
+      });
+
+      const data = {
+        message: 'success',
+        status: 'success',
+      };
+
+      return data;
+    }
   }
 }

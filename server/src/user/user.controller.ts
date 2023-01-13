@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
+import { CreateUserDto, UpdateUserDto } from './dto';
 
-@Controller('user')
+@Controller('api/user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(config: ConfigService, private userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
+  @Get('getAll')
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Get('get/:id')
+  async getUserById(@Param('id') userId: string) {
+    const getUserById = await this.userService.getUserById(userId);
+
+    if (!getUserById) {
+      return new NotFoundException(`userId ${userId} not found user`);
+    }
+    return getUserById;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Post('add')
+  createUser(@Body() dto: CreateUserDto) {
+    return this.userService.createUser(dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Patch('update/:id')
+  updateUserById(@Param('id') userId: string, @Body() dto: UpdateUserDto) {
+    return this.userService.updateUser(userId, dto);
+  }
+
+  @Delete('delete/:id')
+  deleteUserById(@Param('id') userId: string) {
+    return this.userService.deleteUserById(userId);
   }
 }
