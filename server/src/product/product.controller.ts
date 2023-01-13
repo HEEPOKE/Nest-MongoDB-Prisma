@@ -4,29 +4,24 @@ import {
   Post,
   Body,
   Patch,
-  HttpCode,
-  HttpStatus,
   Param,
-  ParseIntPipe,
   Delete,
-  UseGuards,
-  Redirect,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
 
-@Controller('product')
+@Controller('api/product')
 export class ProductController {
   constructor(config: ConfigService, private productService: ProductService) {}
 
-  @Get('getProducts')
+  @Get('getAll')
   findAll() {
     return this.productService.findAll();
   }
 
-  @Get('product/:id')
+  @Get('get/:id')
   async getProductById(@Param('id') productId: string) {
     const getProductById = await this.productService.getProductUserById(
       productId,
@@ -39,8 +34,20 @@ export class ProductController {
   }
 
   @Post('add')
-  // @Redirect(config.get('ENDPOINT_URL'), 200)
   createBookmark(@Body() dto: CreateProductDto) {
     return this.productService.createProduct(dto);
+  }
+
+  @Patch('update/:id')
+  updateProductById(
+    @Param('id') productId: string,
+    @Body() dto: UpdateProductDto,
+  ) {
+    return this.productService.updateProduct(productId, dto);
+  }
+
+  @Delete('delete/:id')
+  deleteProductById(@Param('id') productId: string) {
+    return this.productService.deleteProductById(productId);
   }
 }
